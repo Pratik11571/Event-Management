@@ -1,0 +1,145 @@
+<% layout("/layouts/boilerplate") %>
+  <script>
+    function initMap() {
+      const location = {
+        lat: <%= listing.coordinates.coordinates[1] %>,
+        lng: <%= listing.coordinates.coordinates[0] %>,
+      };
+
+      var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 12,
+        center: location,
+      });
+
+      var marker = new google.maps.Marker({
+        position: location,
+        map: map,
+      });
+    }
+  </script>
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=<%=process.env.MAP_API_KEY%>&callback=initMap&libraries=places"></script>
+  <div class="row mt-3">
+    <div class="col-6 offset-3 mt-3">
+      <h3>
+        <%= listing.eventName %>
+      </h3>
+    </div>
+    <div class="card col-6 offset-3 mt-2 show-card listing-card">
+      <img src="<%= listing.image.url%>" class="card-img-top show-img" alt="<%= listing.image.filename %>">
+      <div class="card-body">
+
+        <h5 class="card-skills mt-3">
+          <%= listing.organizationName %>
+        </h5>
+        <h6 class="card-skills mt-3">
+          <%= listing.description %>
+        </h6>
+        <h6 class="card-skills mt-3">
+          <b>Needed Skills:</b>
+          <%= listing.skills %>
+        </h6>
+        <h6 class="card-skills mt-3">
+          <b>Time Slot:</b>
+          <%= new Date('1970-01-01T' + listing.time.from).toLocaleTimeString('en-US', { hour: '2-digit' ,
+            minute: '2-digit' , hour12: true }) %>
+            -
+            <%= new Date('1970-01-01T' + listing.time.to).toLocaleTimeString('en-US', { hour: '2-digit' ,
+              minute: '2-digit' , hour12: true }) %>
+        </h6>
+        <h6 class="card-skills mt-3">
+          <b>Date:</b>
+          <%= new Date(listing.date.from).toLocaleDateString('en-US', { year: 'numeric' , month: 'long' , day: '2-digit'
+            }) %> - <%= new Date(listing.date.to).toLocaleDateString('en-US', { year: 'numeric' , month: 'long' ,
+              day: '2-digit' }) %>
+        </h6>
+        <h6 class="card-skills mt-3">
+          <b>At:</b>
+          <%= listing.location %>
+        </h6>
+        <h6 class="card-skills mt-3">
+          <b>Contact:</b>
+          <%= listing.contactNumber %>
+        </h6>
+        <h6 class="card-skills mt-3">
+          <b>Email:</b>
+          <%= listing.email %>
+        </h6>
+
+
+
+      </div>
+    </div>
+
+    <div class="btns col-8 offset-2 d-flex justify-content-center gap-2 mt-3">
+      <% if (!currUser) { %>
+        <form action="/login" method="get">
+          <button class="btn btn-dark botin" type="submit">Login to Participate</button>
+        </form>
+        <% } %>
+          <% if (currUser && !currUser.equals(listing.owner._id)) { %>
+            <% let alreadyParticipated = listing.reviews.some(r => r.equals(currUser._id)); %>
+            <% if (!alreadyParticipated) { %>
+              <form action="/listings/<%= listing._id %>/participate" method="post">
+                <button class="btn btn-dark botin" type="submit">Participate</button>
+              </form>
+            <% } %>
+          <% } %>
+
+              <% if (currUser && currUser.equals(listing.owner._id)) { %>
+                <a href="/listings/<%= listing._id %>/share" class="btn btn-dark botin">Send Reminder</a>
+
+                <button type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+                  class="btn btn-danger botin">Delete</button>
+                <% } %>
+
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+      aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Delete this listing?</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cancel"></button>
+          </div>
+          <div class="modal-body">
+            Do you really want to delete this listing?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
+              <button type="submit" class="btn btn-primary edit-btn">Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 offset-3 mt-3 mb-4">
+      <hr>
+      <h4>Volunteers</h4>
+      <div class="row">
+        <% for(review of listing.reviews) { %>
+          <div class="card review-card col-5 ms-3 mb-3">
+            <div class="card-body">
+              <a href="/listings/<%= listing._id %>/<%=review._id%>">
+                <img src="<%= review.image.url%>" class="card-img-top show-img"
+                  style="border-radius: 50% !important; max-height: 3rem; max-width: 3rem;"
+                  alt="<%= review.image.filename %>">
+                <h5 class="card-text">@<%= review.username %>
+                </h5>
+              </a>
+            </div>
+          </div>
+      </div>
+      <% } %>
+        <hr>
+    </div>
+    <div class="col-7 offset-2 mb-4">
+      <h3 class="col-8 offset-1 mb-3">Event location on Map</h3>
+      <div class="offset-1" id="map">
+      </div>
+    </div>
+  </div>
+  </div>

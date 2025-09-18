@@ -1,0 +1,116 @@
+<% layout("/layouts/boilerplate") %>
+<div class="row mt-3">
+  <div class="col-8 offset-2">
+    <h3>Register a New Event</h3>
+
+    <form method="POST" action="/listings" class="needs-validation" novalidate enctype="multipart/form-data">
+      <div class="mb-3 mt-3">
+        <label for="organizationName" class="form-label">Organization Name</label>
+        <input name="listing[organizationName]" placeholder="Add a catchy organization name" type="text"
+          class="form-control" required />
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Please enter a valid organization name</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="eventName" class="form-label">Event Name</label>
+        <input name="listing[eventName]" placeholder="Add a catchy event name" type="text" class="form-control"
+          required />
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Please enter a valid event name</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea name="listing[description]" class="form-control" required></textarea>
+        <div class="valid-feedback">Your description is great!</div>
+        <div class="invalid-feedback">Please enter a valid description</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="skills" class="form-label">Skills Required</label>
+        <select name="listing[skills]" id="skills" class="form-control" required>
+          <option value="" disabled selected>Select required skill</option>
+          <option value="Teaching">Teaching</option>
+          <option value="Field Work">Field Work</option>
+          <option value="Health Care">Health Care</option>
+          <option value="Fitness Coaching">Fitness Coaching</option>
+          <option value="Animal Care">Animal Care</option>
+          <option value="Others">Others</option>
+        </select>
+        <div class="valid-feedback">Noted!</div>
+        <div class="invalid-feedback">Please select required skills</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="img-url" class="form-label">Upload Image</label>
+        <input name="listing[image][url]" type="file" class="form-control" />
+      </div>
+
+      <div class="row">
+        <div class="mb-3 col-md-6">
+          <label for="country" class="form-label">Country</label>
+          <input name="listing[country]" placeholder="India" type="text" class="form-control" required />
+          <div class="valid-feedback">Looks good!</div>
+          <div class="invalid-feedback">Please enter a valid country</div>
+        </div>
+
+        <div class="mb-3 col-md-6">
+          <label for="location" class="form-label">Location</label>
+          <input name="listing[location]" placeholder="City/Area" type="text" class="form-control" required />
+          <div class="valid-feedback">Looks good!</div>
+          <div class="invalid-feedback">Please enter a valid location</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="mb-3 col-md-6">
+          <label for="date-from" class="form-label">Date From</label>
+          <input name="listing[date][from]" type="date" class="form-control" required />
+          <div class="valid-feedback">Noted!</div>
+          <div class="invalid-feedback">Please select a valid start date</div>
+        </div>
+
+        <div class="mb-3 col-md-6">
+          <label for="date-to" class="form-label">Date To</label>
+          <input name="listing[date][to]" type="date" class="form-control" required />
+          <div class="valid-feedback">Noted!</div>
+          <div class="invalid-feedback">Please select a valid end date</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="mb-3 col-md-6">
+          <label for="time-from" class="form-label">Time From</label>
+          <input name="listing[time][from]" type="time" class="form-control" required />
+          <div class="valid-feedback">Noted!</div>
+          <div class="invalid-feedback">Please enter a valid start time</div>
+        </div>
+
+        <div class="mb-3 col-md-6">
+          <label for="time-to" class="form-label">Time To</label>
+          <input name="listing[time][to]" type="time" class="form-control" required />
+          <div class="valid-feedback">Noted!</div>
+          <div class="invalid-feedback">Please enter a valid end time</div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="contactNumber" class="form-label">Contact Number</label>
+        <input name="listing[contactNumber]" placeholder="Enter your phone number" type="text" class="form-control" required 
+          pattern="^\d{10,15}$" />
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Please enter a valid phone number (10-15 digits)</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input name="listing[email]" placeholder="Enter your email" type="email" class="form-control" required />
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Please enter a valid email address</div>
+      </div>
+
+      <button class="btn btn-dark add-btn mt-3 mb-3">Add</button>
+    </form>
+  </div>
+</div>

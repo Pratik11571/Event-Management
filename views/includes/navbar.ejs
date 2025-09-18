@@ -1,0 +1,133 @@
+<link rel="stylesheet" href="/css/navbar.css" />
+<link rel="stylesheet" href="/css/style.css" />
+
+<nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/listings"
+      ><i class="fa-solid fa-hands-holding-circle fa-xl" style="color: brown;"></i></a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNavAltMarkup"
+      aria-controls="navbarNavAltMarkup"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+      <!-- Skill Dropdown Form -->
+      <div class="navbar-nav ms-auto">
+        <li class="nav-item dropdown me-3">
+            <a class="form-select btn btn-custom nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Skill
+          </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="/listings/skill?skill=Teaching">Teaching</a></li>
+              <li><a class="dropdown-item" href="/listings/skill?skill=Field Work">Field Work</a></li>
+              <li><a class="dropdown-item" href="/listings/skill?skill=Health Care">Health Care</a></li>
+              <li><a class="dropdown-item" href="/listings/skill?skill=Fitness Coaching">Fitness Coaching</a></li>
+              <li><a class="dropdown-item" href="/listings/skill?skill=Animal Care">Animal Care</a></li>
+              <li><a class="dropdown-item" href="/listings/skill?skill=Others">Others</a></li>
+            </ul>  
+          </li>
+        
+      </div>
+
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav ms-auto">
+        <form
+          method="get"
+          action="/listings/search"
+          class="d-flex"
+          role="search"
+        >
+          <input
+            class="form-control me-2 search-inp"
+            type="search"
+            placeholder="Search destinations"
+            name="title"
+            aria-label="Search"
+          />
+          <button class="btn search-btn" type="submit">
+            <i class="fa-solid fa-magnifying-glass"></i>Search
+          </button>
+        </form>
+      </div>
+
+
+
+      <div class="navbar-nav ms-auto">
+        <div class="nav-item dropdown me-3">
+          <a class="form-select btn btn-custom nav-link dropdown-toggle" href="#" id="nearbyDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Events near you
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="nearbyDropdown">
+            <li><a class="dropdown-item near-option" data-distance="1" href="#">within 1km</a></li>
+            <li><a class="dropdown-item near-option" data-distance="2" href="#">within 2km</a></li>
+            <li><a class="dropdown-item near-option" data-distance="5" href="#">within 5km</a></li>
+            <li><a class="dropdown-item near-option" data-distance="10" href="#">within 10km</a></li>
+          </ul>
+        </div>
+        <a class="nav-link" href="/listings/new">Add an Event</a>
+        <% if(currUser){ %>
+        <a class="nav-link" href="/logout"><b>Log out</b></a>
+        <% } %> <% if(!currUser) {%>
+        <a class="nav-link" href="/signup"><b>Sign Up</b></a>
+        <a class="nav-link" href="/login"><b>Login</b></a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</nav>
+<br>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".near-option").forEach(option => {
+    option.addEventListener("click", function(e) {
+      e.preventDefault();
+
+      const distance = this.getAttribute("data-distance");
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          const { latitude, longitude } = position.coords;
+
+          // Create a form dynamically and submit
+          const form = document.createElement("form");
+          form.method = "POST";
+          form.action = "/listings/find";
+
+          const latInput = document.createElement("input");
+          latInput.type = "hidden";
+          latInput.name = "latitude";
+          latInput.value = latitude;
+
+          const lonInput = document.createElement("input");
+          lonInput.type = "hidden";
+          lonInput.name = "longitude";
+          lonInput.value = longitude;
+
+          const disInput = document.createElement("input");
+          disInput.type = "hidden";
+          disInput.name = "dis";
+          disInput.value = distance;
+
+          form.appendChild(latInput);
+          form.appendChild(lonInput);
+          form.appendChild(disInput);
+
+          document.body.appendChild(form);
+          form.submit();
+        }, (err) => {
+          console.error("Geolocation error:", err);
+        });
+      } else {
+        alert("Geolocation is not supported by your browser.");
+      }
+    });
+  });
+});
+</script>
