@@ -30,7 +30,7 @@ const initDB = async () => {
   // Set initial data with empty coordinates object
   initData.data = initData.data.map((obj) => ({
     ...obj,
-    owner: "67a3eaa83317d07856893708",
+    owner: "68cc12751ccc84b7198e3ab1",
     coordinates: { type: "Point", coordinates: [0, 0] }  // Initialize coordinates with default values
   }));
   
