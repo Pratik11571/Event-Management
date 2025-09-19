@@ -131,9 +131,9 @@ module.exports.getFindListings = async (req, res) => {
             s = "Events Found!"
         }
 
-        req.flash("success",s);
-        req.flash("error",e);
-        
+        req.flash("success", s);
+        req.flash("error", e);
+
         res.render("listings/index.ejs", {
             listings: nearbyListings,
             success: req.flash("success"),
@@ -208,11 +208,39 @@ module.exports.createNewListing = async (req, res) => {
         await newListing.save();
 
         req.flash("success", "New Listing created!");
-        const allUsers = await User.find({ location: newListing.location })
+        // const allUsers = await User.find({ location: newListing.location })
+        const allUsers = await User.find({ _id: {$ne: newListing.owner}});
+        if (allUsers.length === 0) return;
 
+        const MAX_DISTANCE_KM = 1;
 
-        if (allUsers.length > 0) {
-            const recipients = allUsers; // List of emails
+        const origin = `${newListing.coordinates.coordinates[1]},${newListing.coordinates.coordinates[0]}`;
+        const destinations = allUsers.map(user => `${user.coordinates.coordinates[1]},${user.coordinates.coordinates[0]}`).join("|");
+
+        const response = await axios.get("https://maps.googleapis.com/maps/api/distancematrix/json", {
+            params: {
+                origins: origin,
+                destinations: destinations,
+                key: process.env.MAP_API_KEY,
+                mode: "driving"
+            }
+        });
+
+        let nearbyUsers = [];
+
+        if (response.data.status === 'OK' && response.data.rows[0]) {
+            const distances = response.data.rows[0].elements;
+
+            // 5. Filter the users who are within the MAX_DISTANCE_KM.
+            nearbyUsers = allUsers.filter((user, index) => {
+                const distanceInfo = distances[index];
+                // Check if a valid route was found and the distance is within the limit.
+                return distanceInfo.status === "OK" && (distanceInfo.distance.value / 1000) <= MAX_DISTANCE_KM;
+            });
+        }
+
+        if (nearbyUsers.length > 0) {
+            const recipients = nearbyUsers; // List of emails
             const transporter = nodemailer.createTransport({
                 service: "gmail",
                 secure: true,
@@ -358,7 +386,7 @@ module.exports.sendEmail = async (req, res) => {
         // Send email to each reviewer
         allEmails.forEach((email) => {
             const mailOptions = {
-                from: listing.owner.email,
+                from: listing.email || listing.owner.email,
                 to: email,
                 subject: subject,
                 text: content
@@ -396,23 +424,23 @@ module.exports.participate = async (req, res) => {
         return res.redirect("/listings");
     }
 
-    if(listing.reviews.includes(id_user)) {
-        req.flash("error","Already Participated!");
+    if (listing.reviews.includes(id_user)) {
+        req.flash("error", "Already Participated!");
         return res.redirect("/listings");
     }
 
     listing.reviews.push(id_user);
-    
+
     await listing.save();
 
     req.flash("success", "Participated successfully!");
     return res.redirect(`/listings/${id}`);
 }
 
-module.exports.getVolunteer = async(req,res) => {
-    let {id,v_id} = req.params;
+module.exports.getVolunteer = async (req, res) => {
+    let { id, v_id } = req.params;
     let users = await User.findById(v_id);
     let listing = await Listing.findById(id);
-    
-    res.render("volunteer.ejs", { volunteer : users,listing } )
+
+    res.render("volunteer.ejs", { volunteer: users, listing })
 }
